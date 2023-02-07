@@ -10,51 +10,36 @@ import css from './phone-book.module.css';
 class PhoneBook extends Component {
   state = {
     contacts: [],
-    name: '',
-    number: '',
     filter: '',
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-
-    const { name, number } = this.state;
-    if (this.isDublicate()) {
+  addContact = ({ number, name }) => {
+    if (this.isDublicate(number, name)) {
       return alert(`${name} ${number} already on your contact list`);
     }
-
     this.setState(prevState => {
-      const { name, number, contacts } = prevState;
-
+      const { contacts } = prevState;
       const newContact = {
         id: nanoid(),
         name,
         number,
       };
-
       return {
         contacts: [newContact, ...contacts],
-        name: '',
-        number: '',
       };
     });
-  };
-
-  inputValue = e => {
-    const { name, value } = e.target;
-    this.setState({ [name]: value });
   };
 
   removeContact = id => {
     this.setState(prevState => {
       const { contacts } = prevState;
       const newListContacts = contacts.filter(contact => contact.id !== id);
-      return { contacts: newListContacts, name: '', number: '' };
+      return { contacts: newListContacts };
     });
   };
 
-  isDublicate = () => {
-    const { number, name, contacts } = this.state;
+  isDublicate = (name, number) => {
+    const { contacts } = this.state;
     const normalizeName = name.toLocaleLowerCase();
     const normalizeNumber = number.toLocaleLowerCase();
 
@@ -71,33 +56,29 @@ class PhoneBook extends Component {
     if (!filter) {
       return contacts;
     }
-
     const normalizeFilter = filter.toLowerCase();
     const findElement = contacts.filter(({ name }) =>
       name.toLocaleLowerCase().includes(normalizeFilter)
     );
-
     return findElement;
+  };
+
+  handleFilter = e => {
+    this.setState({ filter: e.target.value });
   };
 
   render() {
     const contacts = this.filterContact();
-    const { number, name } = this.state;
 
     return (
       <div className={css.wrapper}>
         <h2 className={css.page_tittle}> Phone book</h2>
         <div className={css.info}>
           <div className={css.new_contact}>
-            <ContactForm
-              handleSubmit={this.handleSubmit}
-              name={name}
-              number={number}
-              inputValue={this.inputValue}
-            />
+            <ContactForm addContact={this.addContact} />
           </div>
           <div className={css.list_contacts}>
-            <Filter inputValue={this.inputValue} />
+            <Filter inputValue={this.handleFilter} />
             <h3 className={css.tittle_list}>List contacts</h3>
             <ContactList
               items={contacts}
