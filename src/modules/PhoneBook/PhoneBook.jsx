@@ -14,7 +14,7 @@ class PhoneBook extends Component {
   };
 
   addContact = ({ number, name }) => {
-    if (this.isDublicate(number, name)) {
+    if (this.isDublicate(name)) {
       return alert(`${name} ${number} already on your contact list`);
     }
     this.setState(prevState => {
@@ -38,15 +38,12 @@ class PhoneBook extends Component {
     });
   };
 
-  isDublicate = (name, number) => {
+  isDublicate = name => {
     const { contacts } = this.state;
     const normalizeName = name.toLocaleLowerCase();
-    const normalizeNumber = number.toLocaleLowerCase();
 
     const dublicateItem = contacts.find(
-      ({ number, name }) =>
-        normalizeName === name.toLocaleLowerCase() &&
-        normalizeNumber === number.toLocaleLowerCase()
+      ({ name }) => normalizeName === name.toLocaleLowerCase()
     );
     return Boolean(dublicateItem);
   };
